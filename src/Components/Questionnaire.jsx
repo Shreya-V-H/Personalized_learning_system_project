@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import './Questionnaire.css';
 
 function Questionnaire() {
@@ -61,6 +62,14 @@ function Questionnaire() {
       return;
     }
 
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('User not signed in!');
+      return;
+    }
+
     const data = {
       topics: selectedTopics,
       skillLevel,
@@ -70,12 +79,20 @@ function Questionnaire() {
     };
 
     try {
-      console.log("Form Data Being Submitted:", data);
-      await addDoc(collection(db, 'userData'), data);
+      await setDoc(doc(db, 'userPreferences', user.uid), data); // 🔐 Save with UID
       console.log('Saved to Firestore:', data);
-      navigate('/recommendations', { state: { selectedTopics, skillLevel, contentType, languages } });
+
+      // ⏩ Navigate to recommendations with state
+      navigate('/recommendations', {
+        state: {
+          selectedTopics,
+          skillLevel,
+          contentType,
+          selectedLanguages: languages,
+        },
+      });
     } catch (error) {
-      console.error('Error saving preferences:', error.message, error);
+      console.error('Error saving preferences:', error.message);
       alert('Failed to save preferences. Try again.');
     }
   };
