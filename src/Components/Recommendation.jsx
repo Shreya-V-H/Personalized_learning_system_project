@@ -21,7 +21,7 @@ const trustedChannelIds = [
   "UC4xKdmAXFh4ACyhpiQ_3qBw", // Codevolution
 ];
 
-const API_KEY = "AIzaSyCQ_yQweed2qQmD69hlHoceMleHzhef0fs";
+const API_KEY = "";
 
 function Recommendation() {
   const location = useLocation();
